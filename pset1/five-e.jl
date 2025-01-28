@@ -47,7 +47,7 @@ end
 names = get_names()
 
 # TODO fix me for whole thing
-# names = [names[2]]
+names = [names[2]]
 # println(names)
 
 
@@ -68,9 +68,9 @@ for name in names
 end
 
 # TODO change to get all edges
-edges :: Dict{String, Set{Tuple{Int, Int}}} = get_all_edges()
-
-# edges["Amherst41"] = get_edges("Amherst41.txt")
+# edges :: Dict{String, Set{Tuple{Int, Int}}} = get_all_edges()
+edges :: Dict{String, Set{Tuple{Int, Int}}} = Dict()
+edges["Amherst41"] = get_edges("Amherst41.txt")
 
 
 # Function to perform DFS and find a connected component
@@ -82,6 +82,45 @@ function dfs(v, adj_list, visited, component)
           dfs(neighbor, adj_list, visited, component)
       end
   end
+end
+
+function bfs(source::Int, adj_list::Dict{Int, Set{Int}})
+  dist = Dict{Int, Int}()  # Dictionary to handle arbitrary node IDs
+
+  # Initialize distances to Inf for all nodes
+  for node in keys(adj_list)
+      dist[node] = 10000000
+  end
+  dist[source] = 0.0  # Distance to itself is 0
+
+  # BFS queue
+  queue = [source]
+  while !isempty(queue)
+      current = popfirst!(queue)
+      for neighbor in adj_list[current]
+          if dist[neighbor] == 10000000  # Check if the neighbor hasn't been visited
+              dist[neighbor] = dist[current] + 1
+              push!(queue, neighbor)
+          end
+      end
+  end
+  return dist
+end
+
+function apsp(adj_list, nodes)
+  all_pairs_distances = Dict{Tuple{Int, Int}, Int}()  # Map (n1, n2) -> distance
+
+  for source in nodes
+      # Run BFS from the source node
+      dist_from_source = bfs(source, adj_list)
+      
+      # Add distances to the dictionary
+      for (target, distance) in dist_from_source
+          all_pairs_distances[(source, target)] = distance
+      end
+  end
+
+  return all_pairs_distances
 end
 
 function dijkstra(source, adj_list, nodes)
@@ -171,24 +210,29 @@ for (name, edges) in edges
 
 
   count = length(largest_comp)
+
+  all_pairs_distances = apsp(new_adj_list, largest_comp)
+
+  # print(dist_matrix)
+
   # Find All-Pairs Shortest Path in the largest component
-  all_pairs_distances = Dict{Tuple{Int, Int}, Int}()
-  for u in largest_comp
-      flag = false 
-      if count % 10 == 0 
-        println("count ")
-        print(count)
-        flag = true 
-      end
-      count -= 1
-      dist = dijkstra(u, new_adj_list, largest_comp)
-      for v in largest_comp
-          # if flag
-          #   println(dist[v])
-          # end
-          all_pairs_distances[(u, v)] = dist[v]
-      end
-  end
+  # all_pairs_distances = Dict{Tuple{Int, Int}, Int}()
+  # for u in largest_comp
+  #     flag = false 
+  #     if count % 100 == 0 
+  #       println("count ")
+  #       print(count)
+  #       flag = true 
+  #     end
+  #     count -= 1
+  #     dist = dijkstra(u, new_adj_list, largest_comp)
+  #     for v in largest_comp
+  #         # if flag
+  #         #   println(dist[v])
+  #         # end
+  #         all_pairs_distances[(u, v)] = dist[v]
+  #     end
+  # end
 
   total_dist :: Int = 0
 
