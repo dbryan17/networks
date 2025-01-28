@@ -63,10 +63,12 @@ for (k,v) in edges
 end
 
 avgs = []
+avgs_dict :: Dict{String, Float64} = Dict()
 for (k,v) in total_nodes
   # (2 * |e|) / |nodes|
   avg = (2 * edges_counts[k]) / v
   push!(avgs, avg)
+  avgs_dict[k] = avg
 
 end
 
@@ -76,7 +78,7 @@ if length(avgs) != 100
 
 end
 
-
+print(avgs_dict)
 using Plots
 gr()
 p = histogram(avgs, binwidth=5, title="Average Degree Distribution in Facebook 100", xlabel="Average Degree", ylabel="Frequency", legend=false)
