@@ -1,0 +1,9 @@
+Yale4
+average dist
+2.677439283994904
+size of largest comp
+8561
+max dist
+9
+total nodes
+8578

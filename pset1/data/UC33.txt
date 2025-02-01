@@ -1,0 +1,9 @@
+UC33
+average dist
+3.0279446409791966
+size of largest comp
+16800
+max dist
+8
+total nodes
+16808

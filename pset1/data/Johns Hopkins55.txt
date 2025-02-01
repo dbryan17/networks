@@ -1,0 +1,9 @@
+Johns Hopkins55
+average dist
+2.710212139442153
+size of largest comp
+5157
+max dist
+8
+total nodes
+5180

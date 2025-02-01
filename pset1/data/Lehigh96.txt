@@ -1,0 +1,9 @@
+Lehigh96
+average dist
+2.625050990553689
+size of largest comp
+5073
+max dist
+6
+total nodes
+5075

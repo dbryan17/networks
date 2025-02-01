@@ -1,0 +1,9 @@
+Wisconsin87
+average dist
+2.9549913202798
+size of largest comp
+23831
+max dist
+9
+total nodes
+23842

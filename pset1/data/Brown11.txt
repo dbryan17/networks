@@ -1,0 +1,9 @@
+Brown11
+average dist
+2.6961558555658254
+size of largest comp
+8586
+max dist
+9
+total nodes
+8600

@@ -1,0 +1,9 @@
+Bingham82
+average dist
+2.820404379562044
+size of largest comp
+10001
+max dist
+8
+total nodes
+10004

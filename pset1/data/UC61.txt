@@ -1,0 +1,9 @@
+UC61
+average dist
+2.9868832499858478
+size of largest comp
+13736
+max dist
+8
+total nodes
+13746

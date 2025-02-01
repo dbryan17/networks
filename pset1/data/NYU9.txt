@@ -1,0 +1,9 @@
+NYU9
+average dist
+3.0071115354704343
+size of largest comp
+21623
+max dist
+8
+total nodes
+21679

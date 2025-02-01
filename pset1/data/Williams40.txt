@@ -1,0 +1,9 @@
+Williams40
+average dist
+2.4159885593030563
+size of largest comp
+2788
+max dist
+6
+total nodes
+2790

@@ -1,0 +1,9 @@
+Michigan23
+average dist
+3.055328456736814
+size of largest comp
+30106
+max dist
+9
+total nodes
+30147

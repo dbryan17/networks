@@ -1,0 +1,9 @@
+Maine59
+average dist
+2.931364631919417
+size of largest comp
+9065
+max dist
+7
+total nodes
+9069

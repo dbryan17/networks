@@ -1,0 +1,9 @@
+FSU53
+average dist
+3.01995229450708
+size of largest comp
+27731
+max dist
+8
+total nodes
+27737

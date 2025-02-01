@@ -1,0 +1,9 @@
+Haverford76
+average dist
+2.2278663967417573
+size of largest comp
+1446
+max dist
+6
+total nodes
+1446

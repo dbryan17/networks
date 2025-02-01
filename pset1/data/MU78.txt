@@ -1,0 +1,9 @@
+MU78
+average dist
+2.849498367485558
+size of largest comp
+15425
+max dist
+7
+total nodes
+15436

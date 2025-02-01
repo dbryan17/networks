@@ -1,0 +1,9 @@
+American75
+average dist
+2.7659693378420247
+size of largest comp
+6370
+max dist
+9
+total nodes
+6386

@@ -1,0 +1,9 @@
+GWU54
+average dist
+2.825785383745178
+size of largest comp
+12164
+max dist
+9
+total nodes
+12193

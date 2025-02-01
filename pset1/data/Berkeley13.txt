@@ -1,0 +1,9 @@
+Berkeley13
+average dist
+2.9399059206452636
+size of largest comp
+22900
+max dist
+7
+total nodes
+22937

@@ -1,0 +1,9 @@
+BU10
+average dist
+3.027826611350825
+size of largest comp
+19666
+max dist
+9
+total nodes
+19700

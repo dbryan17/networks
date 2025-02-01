@@ -1,0 +1,9 @@
+Rochester38
+average dist
+2.642654927166634
+size of largest comp
+4561
+max dist
+7
+total nodes
+4563

@@ -1,0 +1,9 @@
+Northwestern25
+average dist
+2.723483809339746
+size of largest comp
+10537
+max dist
+9
+total nodes
+10567

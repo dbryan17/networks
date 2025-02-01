@@ -1,0 +1,9 @@
+MIT8
+average dist
+2.7202753728586515
+size of largest comp
+6402
+max dist
+8
+total nodes
+6440

@@ -1,0 +1,9 @@
+Trinity100
+average dist
+2.4275852449379913
+size of largest comp
+2613
+max dist
+6
+total nodes
+2613

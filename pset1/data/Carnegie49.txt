@@ -1,0 +1,9 @@
+Carnegie49
+average dist
+2.7380666934057203
+size of largest comp
+6621
+max dist
+8
+total nodes
+6637

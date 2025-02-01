@@ -1,0 +1,9 @@
+Tulane29
+average dist
+2.809903629157063
+size of largest comp
+7740
+max dist
+8
+total nodes
+7752

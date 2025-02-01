@@ -1,0 +1,9 @@
+UCSB37
+average dist
+2.996593872884866
+size of largest comp
+14917
+max dist
+8
+total nodes
+14935

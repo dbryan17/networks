@@ -1,0 +1,9 @@
+Georgetown15
+average dist
+2.7568827225678896
+size of largest comp
+9388
+max dist
+11
+total nodes
+9414

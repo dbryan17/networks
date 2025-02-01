@@ -1,0 +1,9 @@
+Dartmouth6
+average dist
+2.767929834878965
+size of largest comp
+7677
+max dist
+8
+total nodes
+7694

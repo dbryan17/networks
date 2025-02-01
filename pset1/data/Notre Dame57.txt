@@ -1,0 +1,9 @@
+Notre Dame57
+average dist
+2.739745853490274
+size of largest comp
+12149
+max dist
+8
+total nodes
+12155

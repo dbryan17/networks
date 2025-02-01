@@ -1,0 +1,9 @@
+Columbia2
+average dist
+2.836523663589642
+size of largest comp
+11706
+max dist
+9
+total nodes
+11770

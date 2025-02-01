@@ -1,0 +1,9 @@
+Simmons81
+average dist
+2.5703588622788653
+size of largest comp
+1510
+max dist
+7
+total nodes
+1518

@@ -1,0 +1,9 @@
+Mississippi66
+average dist
+2.62201341550556
+size of largest comp
+10519
+max dist
+7
+total nodes
+10521

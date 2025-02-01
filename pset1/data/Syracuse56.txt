@@ -1,0 +1,9 @@
+Syracuse56
+average dist
+2.8624115466708693
+size of largest comp
+13640
+max dist
+7
+total nodes
+13653

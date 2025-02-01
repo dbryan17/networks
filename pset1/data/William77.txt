@@ -1,0 +1,9 @@
+William77
+average dist
+2.60508718273159
+size of largest comp
+6472
+max dist
+8
+total nodes
+6472

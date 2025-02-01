@@ -1,0 +1,9 @@
+Indiana69
+average dist
+2.9612991458461773
+size of largest comp
+29732
+max dist
+8
+total nodes
+29747

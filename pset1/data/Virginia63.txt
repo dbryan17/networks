@@ -1,0 +1,9 @@
+Virginia63
+average dist
+2.869331223415873
+size of largest comp
+21319
+max dist
+9
+total nodes
+21325

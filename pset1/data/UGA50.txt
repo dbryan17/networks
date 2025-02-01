@@ -1,0 +1,9 @@
+UGA50
+average dist
+2.8498133168512916
+size of largest comp
+24380
+max dist
+8
+total nodes
+24389

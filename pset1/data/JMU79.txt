@@ -1,0 +1,9 @@
+JMU79
+average dist
+2.829871882830701
+size of largest comp
+14070
+max dist
+7
+total nodes
+14070

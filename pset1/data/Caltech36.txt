@@ -1,0 +1,9 @@
+Caltech36
+average dist
+2.3378480449470755
+size of largest comp
+762
+max dist
+6
+total nodes
+769

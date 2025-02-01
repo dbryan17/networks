@@ -1,0 +1,9 @@
+Duke14
+average dist
+2.71214107931213
+size of largest comp
+9885
+max dist
+8
+total nodes
+9895

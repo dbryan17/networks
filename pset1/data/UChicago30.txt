@@ -1,0 +1,9 @@
+UChicago30
+average dist
+2.8076941628469783
+size of largest comp
+6561
+max dist
+10
+total nodes
+6591

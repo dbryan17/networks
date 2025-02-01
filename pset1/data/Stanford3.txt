@@ -1,0 +1,9 @@
+Stanford3
+average dist
+2.818565439321086
+size of largest comp
+11586
+max dist
+9
+total nodes
+11621

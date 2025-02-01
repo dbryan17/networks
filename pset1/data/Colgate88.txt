@@ -1,0 +1,9 @@
+Colgate88
+average dist
+2.4565714164082
+size of largest comp
+3482
+max dist
+6
+total nodes
+3482

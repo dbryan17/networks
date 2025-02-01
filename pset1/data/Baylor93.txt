@@ -1,0 +1,9 @@
+Baylor93
+average dist
+2.6675292345431396
+size of largest comp
+12799
+max dist
+7
+total nodes
+12803

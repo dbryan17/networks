@@ -1,0 +1,9 @@
+Middlebury45
+average dist
+2.5065405707833266
+size of largest comp
+3069
+max dist
+7
+total nodes
+3075

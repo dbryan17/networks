@@ -1,0 +1,9 @@
+USC35
+average dist
+2.8008272544770736
+size of largest comp
+17440
+max dist
+9
+total nodes
+17444

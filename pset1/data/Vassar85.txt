@@ -1,0 +1,9 @@
+Vassar85
+average dist
+2.462171860181288
+size of largest comp
+3068
+max dist
+8
+total nodes
+3068

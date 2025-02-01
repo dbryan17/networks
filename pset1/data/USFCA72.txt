@@ -1,0 +1,9 @@
+USFCA72
+average dist
+2.6909074961271764
+size of largest comp
+2672
+max dist
+7
+total nodes
+2682

@@ -1,0 +1,9 @@
+Maryland58
+average dist
+2.9368861018079278
+size of largest comp
+20829
+max dist
+7
+total nodes
+20871

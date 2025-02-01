@@ -1,0 +1,9 @@
+Howard90
+average dist
+2.4174042005935936
+size of largest comp
+4047
+max dist
+7
+total nodes
+4047

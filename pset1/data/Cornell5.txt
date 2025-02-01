@@ -1,0 +1,9 @@
+Cornell5
+average dist
+2.875888350303363
+size of largest comp
+18621
+max dist
+8
+total nodes
+18660

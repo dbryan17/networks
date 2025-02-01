@@ -1,0 +1,9 @@
+Bowdoin47
+average dist
+2.4287151820562225
+size of largest comp
+2250
+max dist
+6
+total nodes
+2252

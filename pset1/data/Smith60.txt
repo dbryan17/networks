@@ -1,0 +1,9 @@
+Smith60
+average dist
+2.4976571599003394
+size of largest comp
+2970
+max dist
+7
+total nodes
+2970

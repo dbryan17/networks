@@ -1,0 +1,9 @@
+Vanderbilt48
+average dist
+2.6129539969490447
+size of largest comp
+8063
+max dist
+7
+total nodes
+8069

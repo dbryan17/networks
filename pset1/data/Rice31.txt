@@ -1,0 +1,9 @@
+Rice31
+average dist
+2.467679650198124
+size of largest comp
+4083
+max dist
+6
+total nodes
+4087

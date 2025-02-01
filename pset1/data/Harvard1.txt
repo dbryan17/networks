@@ -1,0 +1,9 @@
+Harvard1
+average dist
+2.8854296728806768
+size of largest comp
+15086
+max dist
+11
+total nodes
+15126

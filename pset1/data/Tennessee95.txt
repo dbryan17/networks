@@ -1,0 +1,9 @@
+Tennessee95
+average dist
+2.7519497119155
+size of largest comp
+16977
+max dist
+7
+total nodes
+16979

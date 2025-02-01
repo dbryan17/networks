@@ -1,0 +1,9 @@
+Santa74
+average dist
+2.485804514995735
+size of largest comp
+3578
+max dist
+8
+total nodes
+3578

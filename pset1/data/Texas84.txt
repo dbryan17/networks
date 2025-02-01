@@ -1,0 +1,9 @@
+Texas84
+average dist
+2.893728534457911
+size of largest comp
+36364
+max dist
+7
+total nodes
+36371

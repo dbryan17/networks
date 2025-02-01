@@ -1,0 +1,9 @@
+Mich67
+average dist
+2.8394297810185662
+size of largest comp
+3745
+max dist
+7
+total nodes
+3748

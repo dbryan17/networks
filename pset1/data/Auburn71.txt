@@ -1,0 +1,9 @@
+Auburn71
+average dist
+2.675469522140996
+size of largest comp
+18448
+max dist
+7
+total nodes
+18448

@@ -1,0 +1,9 @@
+Villanova62
+average dist
+2.7441987471951417
+size of largest comp
+7755
+max dist
+7
+total nodes
+7772

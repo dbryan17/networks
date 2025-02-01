@@ -1,0 +1,9 @@
+Oberlin44
+average dist
+2.5794220201138502
+size of largest comp
+2920
+max dist
+7
+total nodes
+2920

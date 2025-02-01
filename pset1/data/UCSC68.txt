@@ -1,0 +1,9 @@
+UCSC68
+average dist
+3.028758645795413
+size of largest comp
+8979
+max dist
+8
+total nodes
+8991

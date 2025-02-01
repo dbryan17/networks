@@ -1,0 +1,9 @@
+UMass92
+average dist
+2.933624682134013
+size of largest comp
+16502
+max dist
+8
+total nodes
+16516

@@ -1,0 +1,9 @@
+Northeastern19
+average dist
+3.0361457664201192
+size of largest comp
+13868
+max dist
+9
+total nodes
+13882

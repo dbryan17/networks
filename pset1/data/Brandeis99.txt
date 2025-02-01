@@ -1,0 +1,9 @@
+Brandeis99
+average dist
+2.4907866211732075
+size of largest comp
+3887
+max dist
+7
+total nodes
+3898

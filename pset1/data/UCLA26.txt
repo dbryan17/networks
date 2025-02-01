@@ -1,0 +1,9 @@
+UCLA26
+average dist
+3.019381381358236
+size of largest comp
+20453
+max dist
+8
+total nodes
+20467

@@ -1,0 +1,9 @@
+Hamilton46
+average dist
+2.362846413796511
+size of largest comp
+2312
+max dist
+6
+total nodes
+2314

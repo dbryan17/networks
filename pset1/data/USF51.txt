@@ -1,0 +1,9 @@
+USF51
+average dist
+3.132693446727695
+size of largest comp
+13367
+max dist
+8
+total nodes
+13377

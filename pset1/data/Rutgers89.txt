@@ -1,0 +1,9 @@
+Rutgers89
+average dist
+3.0966991337838508
+size of largest comp
+24568
+max dist
+8
+total nodes
+24580

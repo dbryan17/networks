@@ -1,0 +1,9 @@
+Texas80
+average dist
+3.0522886536034415
+size of largest comp
+31538
+max dist
+8
+total nodes
+31560

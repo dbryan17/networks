@@ -1,0 +1,9 @@
+Amherst41
+average dist
+2.4036611329083373
+size of largest comp
+2235
+max dist
+7
+total nodes
+2235

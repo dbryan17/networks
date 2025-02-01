@@ -1,0 +1,9 @@
+UVA16
+average dist
+2.806389228061012
+size of largest comp
+17178
+max dist
+8
+total nodes
+17196

@@ -1,0 +1,9 @@
+Reed98
+average dist
+2.461460580087011
+size of largest comp
+962
+max dist
+6
+total nodes
+962

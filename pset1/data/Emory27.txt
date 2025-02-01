@@ -1,0 +1,9 @@
+Emory27
+average dist
+2.7165848067611638
+size of largest comp
+7449
+max dist
+8
+total nodes
+7460

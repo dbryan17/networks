@@ -1,0 +1,9 @@
+Pepperdine86
+average dist
+2.4997222353712885
+size of largest comp
+3440
+max dist
+9
+total nodes
+3445

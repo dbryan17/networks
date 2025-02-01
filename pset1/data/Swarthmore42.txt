@@ -1,0 +1,9 @@
+Swarthmore42
+average dist
+2.3181765836052
+size of largest comp
+1657
+max dist
+6
+total nodes
+1659

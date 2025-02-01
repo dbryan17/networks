@@ -52,7 +52,7 @@ names = get_names()
 # names = [names[2]]
 # println(names)
 
-names = ["Penn94.txt"]
+names = ["Maine59.txt", "Reed98.txt", "Smith60.txt", "Tufts18.txt", "Tulane29.txt", "UCLA26.txt", "UVA16.txt", "Vermont70.txt", "Wisconsin87.txt"]
 
 
 vertices :: Dict{String, Set{Int}} = Dict()

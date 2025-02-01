@@ -1,0 +1,9 @@
+Bucknell39
+average dist
+2.507091793012344
+size of largest comp
+3824
+max dist
+6
+total nodes
+3826

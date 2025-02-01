@@ -1,0 +1,9 @@
+Wesleyan43
+average dist
+2.5529847521930793
+size of largest comp
+3591
+max dist
+7
+total nodes
+3593

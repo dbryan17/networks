@@ -1,0 +1,9 @@
+UNC28
+average dist
+2.8013603951043136
+size of largest comp
+18158
+max dist
+7
+total nodes
+18163

@@ -1,0 +1,9 @@
+MSU24
+average dist
+3.0434207285097137
+size of largest comp
+32361
+max dist
+8
+total nodes
+32375

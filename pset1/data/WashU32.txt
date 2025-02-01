@@ -1,0 +1,9 @@
+WashU32
+average dist
+2.635222294957065
+size of largest comp
+7730
+max dist
+8
+total nodes
+7755

@@ -1,0 +1,9 @@
+Tufts18
+average dist
+2.7651125239817143
+size of largest comp
+6672
+max dist
+10
+total nodes
+6682

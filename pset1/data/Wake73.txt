@@ -1,0 +1,9 @@
+Wake73
+average dist
+2.514146750500806
+size of largest comp
+5366
+max dist
+9
+total nodes
+5372

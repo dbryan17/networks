@@ -1,0 +1,9 @@
+Temple83
+average dist
+3.048216736671211
+size of largest comp
+13653
+max dist
+8
+total nodes
+13686

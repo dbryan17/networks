@@ -1,0 +1,9 @@
+Oklahoma97
+average dist
+2.7678616043331017
+size of largest comp
+17420
+max dist
+9
+total nodes
+17425

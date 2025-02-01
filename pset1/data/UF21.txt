@@ -1,0 +1,9 @@
+UF21
+average dist
+2.9264644987515323
+size of largest comp
+35111
+max dist
+8
+total nodes
+35123

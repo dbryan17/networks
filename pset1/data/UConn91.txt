@@ -1,0 +1,9 @@
+UConn91
+average dist
+2.918080488200439
+size of largest comp
+17206
+max dist
+8
+total nodes
+17212
