@@ -1,18 +1,8 @@
-# question 3 
-# r = the number of double edge swaps we have applied to some input graph G 
-# carry out numverical experiment to answer the following question: 
-# as a function of r, how does the clustering coeffiecent C, and mean path length <l> relax 
-# onto those of the corresponding configuration model
-# as references, overlay in your plots horizontal lines for the C and <l> when you have r = 20m swaps
-# comment on how "random" Berkley's social network was to begin with, in in what ways, 
-# and on the rate at which randomization destroys the empricial patterns
-
-# import 
-dir_path = "../data/"
 using Graphs
 
+dir_path = "./data/"
 
-# from file names
+
 function get_edges(filename) :: Set{Tuple{Int, Int}}
   edge_set = Set()
   open(dir_path * filename) do f 
@@ -25,6 +15,7 @@ function get_edges(filename) :: Set{Tuple{Int, Int}}
   end
   return edge_set
 end
+
 
 
 # from edge set
@@ -56,7 +47,6 @@ function get_vertices(adj_list :: Dict{Int, Set{Int}}) :: Vector{Int}
   return vertices
 end
 
-
 function bfs(source::Int, adj_list::Dict{Int, Set{Int}})
   dist = Dict{Int, Int}()  # Dictionary to handle arbitrary node IDs
 
@@ -84,15 +74,7 @@ end
 function apsp(adj_list :: Dict{Int, Set{Int}}, nodes :: Vector{Int})
   all_pairs_distances = Dict{Tuple{Int, Int}, Int}()  # Map (n1, n2) -> distance
 
-  count = 0
-
   for source in nodes
-
-      if(count % 100 == 0)
-        println(count)
-      end
-      count += 1
-
       # Run BFS from the source node
       dist_from_source = bfs(source, adj_list)
 
@@ -104,6 +86,8 @@ function apsp(adj_list :: Dict{Int, Set{Int}}, nodes :: Vector{Int})
 
   return all_pairs_distances
 end
+
+
 
 function double_edge_swap(edges :: Set{Tuple{Int, Int}}, adj_dict :: Dict{Int, Set{Int}}, desired :: Int) :: Tuple{Set{Tuple{Int, Int}}, Dict{Int, Set{Int}}}
   # perform [desired] double edge swaps of the given simple graph with edge set and adj_list
@@ -231,6 +215,7 @@ function get_mean_path_length(apsp_list)
 end 
 
 
+
 function comp_global_cc(vertices, adj_dict) :: Float64
   c = 0
   pathlengths2 = 0
@@ -247,15 +232,6 @@ function comp_global_cc(vertices, adj_dict) :: Float64
   end
   return c / pathlengths2
 end
-
-function create_graph(edgeSet, length)
-  g = SimpleGraph(length)
-
-  for (u, v) in edgeSet
-    add_edge!(g, u, v)
-  end
-  return g
-end 
 
 function apsp_built_in(g)
   n = nv(g) 
@@ -277,168 +253,80 @@ function apsp_built_in(g)
     end
   end
   return all_pairs_distances
-end  
+end 
+
+function create_graph(edgeSet, length)
+  g = SimpleGraph(length)
+
+  for (u, v) in edgeSet
+    add_edge!(g, u, v)
+  end
+  return g
+end 
+
+
+
+
 
 ###### begin question #######
 
-dataset = "Berkeley13.txt"
+
+dataset = "social-online-small-2.txt"
 
 edges :: Set{Tuple{Int, Int}} = get_edges(dataset)
 adj_list :: Dict{Int, Set{Int}} = get_adj_list(edges)
 vertices :: Vector{Int} = get_vertices(adj_list)
 
-# print(length(edges))
+config_model_cc :: Vector{Float64} = []
 
-max_swaps = 20 * length(edges)  # 20x the number of edges
-
-# Generate 20 logarithmically spaced points from 1 to max_swaps
-swap_intervals = round.(Int, 10 .^ range(log10(10), log10(max_swaps); length=25))
-
-# print(swap_intervals)
-
-# println(swap_intervals)
-
-path_len_plot = Dict{Int, Float64}()
-
-cc_plot = Dict{Int, Float64}()
-
-edges_len = length(edges)
-println(edges_len)
-# println(length(vertices))
-
-jl_graph = create_graph(edges, length(vertices))
-println("start")
+config_model_mean :: Vector{Float64} = []
 
 apsp_list = apsp_built_in(create_graph(edges, length(vertices)))
-println("one apsp")
+orig_mean_path_len = get_mean_path_length(apsp_list) 
+orig_cc = comp_global_cc(vertices, adj_list)
 
 
 
-mean_path_len = get_mean_path_length(apsp_list) 
+# need 20m swaps for config model, need ~1000 random graphs
 
-
-# good and the new version is way faster
-
-# if(mean_path_len != get_mean_path_length(apsp_list_new))
-#   print("bad")
-# else 
-#   print("googd")
-
-# end
-path_len_plot[0] = mean_path_len
-cc_plot[0] = comp_global_cc(vertices, adj_list)
-
-count = 0
-for swaps in swap_intervals
+for i in 1:1000
   global edges 
   global adj_list
   global count
   global apsp_list
-  global mean_path_len
-  println(count)
-  count += 1
- 
-  
-  (edges, adj_list) = double_edge_swap(edges, adj_list, swaps)
-  # this includes infinate paths and 0 length paths
+  if i % 10 == 0 
+    println(i)
+  end
+  (edges, adj_list) = double_edge_swap(edges, adj_list, 20*length(edges))
   apsp_list = apsp_built_in(create_graph(edges, length(vertices)))
   mean_path_len = get_mean_path_length(apsp_list)
-  path_len_plot[swaps] = mean_path_len
-  cc_plot[swaps] = comp_global_cc(vertices, adj_list)
-
-end
-
-
-using Plots
-gr()
-plot(xlabel = "Number of swaps - n", ylabel = "Mean Path Length - ⟨l⟩",
-     title = "Berkeley Mean Path length vs Number of Swaps", legend = true, grid = true 
-    )
-
-for (swaps, mean_len) in path_len_plot
-  if swaps == 0 || swaps == 20*edges_len
-    println("here!", swaps)
-    continue
-  end
-  scatter!([swaps], [mean_len], label = "", color = :blue, markersize = 5)
-end
-  
-hline!([path_len_plot[edges_len*20]], label = "r = 20m - " * string(edges_len * 20), linestyle = :solid, color = :green)
-hline!([path_len_plot[0]], label = "r = 0", linestyle = :solid, color = :red)
-
-savefig(current(), "swaps_v_mean_reg.pdf")
-
+  cc = comp_global_cc(vertices, adj_list)
+  push!(config_model_cc, cc)
+  push!(config_model_mean, mean_path_len)
+end 
 
 using Plots
+
 gr()
+histogram(config_model_cc, bins=30, title="Friendship Network vs Null - C", xlabel="Clustering Coeficent (C)", ylabel="Frequency", legend=true, label="configuration model")
+vline!([orig_cc], label = "network", linestyle = :solid, color = :green)
+savefig(current(), "cc-online.pdf")
 
-plot(xlabel = "log of number of swaps - log10(n)", ylabel = "Mean Path Length - ⟨l⟩",
-     title = "Berkeley Mean Path length vs Number of Swaps", legend = true, grid = true, xscale=:log10
-    )
-
-for (swaps, mean_len) in path_len_plot
-  if swaps == 0 || swaps == 20*edges_len
-    continue
-  end
-  scatter!([swaps], [mean_len], label = "", color = :blue, markersize = 5)
-end
-  
-hline!([path_len_plot[edges_len*20]], label = "r = 20m - " * string(edges_len * 20), linestyle = :solid, color = :green)
-hline!([path_len_plot[0]], label = "r = 0", linestyle = :solid, color = :red)
-
-
-savefig(current(), "swaps_v_mean_log.pdf")
-
-
-
-
-
-
-
-
-using Plots
 gr()
-plot(xlabel = "Number of swaps - n", ylabel = "Global Clustering Coefficient  - C",
-     title = "Berkeley Clustering Coefficient vs Number of Swaps", legend = true, grid = true 
-    )
+histogram(config_model_mean, bins=30, title="Friendship Network vs Null - ⟨l⟩", xlabel="Mean path length ⟨l⟩", ylabel="Frequency", legend=true, label="configuration model")
+vline!([orig_mean_path_len], label = "network", linestyle = :solid, color = :green)
+savefig(current(), "mp-online.pdf")
 
-for (swaps, mean_len) in cc_plot
-  if swaps == 0 || swaps == 20*edges_len
-    println("here!", swaps)
-    continue
-  end
-  scatter!([swaps], [mean_len], label = "", color = :blue, markersize = 5)
-end
-  
-hline!([cc_plot[edges_len*20]], label = "r = 20m - " * string(edges_len * 20), linestyle = :solid, color = :green)
-hline!([cc_plot[0]], label = "r = 0", linestyle = :solid, color = :red)
-
-savefig(current(), "swaps_v_c_reg.pdf")
-
-
-using Plots
-gr()
-
-plot(xlabel = "log of number of swaps - log10(n)", ylabel = "Global Clustering Coefficient  - C",
-     title = "Berkeley Clustering Coefficient vs Number of Swaps", legend = true, grid = true, xscale=:log10
-    )
-
-for (swaps, mean_len) in cc_plot
-  if swaps == 0 || swaps == 20*edges_len
-    continue
-  end
-  scatter!([swaps], [mean_len], label = "", color = :blue, markersize = 5)
-end
-  
-hline!([cc_plot[edges_len*20]], label = "r = 20m - " * string(edges_len * 20), linestyle = :solid, color = :green)
-hline!([cc_plot[0]], label = "r = 0", linestyle = :solid, color = :red)
-
-
-savefig(current(), "swaps_v_c_log.pdf")
+## https://icon.colorado.edu/networks 
+## M. Fire, and R. Puzis, "Organization mining using online social networks." Networks and Spatial Economics 16(2), 545-578 (2016)
+# small-2 = S1 *** this is the one I used
 
 
 
 
 ########## end ##############
 
+
+
+###### begin other 
 
