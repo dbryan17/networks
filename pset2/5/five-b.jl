@@ -263,7 +263,7 @@ ordered_null_hcs_minus :: Vector{Vector{Float64}} = []
 ordered_null :: Vector{Vector{Float64}} = []
 m_minus = -1
 i = 1
-for (node, hc_minus) in null_hcs
+for (node, hc_minus) in null_hc_minus
   global i 
   global m_minus
   if (node == 8)
