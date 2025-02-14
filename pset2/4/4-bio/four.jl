@@ -308,19 +308,19 @@ end
 using Plots
 
 gr()
-histogram(config_model_cc, bins=30, title="Food Web vs Null - C", xlabel="Clustering Coeficent (C)", ylabel="Frequency", legend=true, label="configuration model")
+histogram(config_model_cc, bins=30, title="Connectome vs Null - C", xlabel="Clustering Coeficent (C)", ylabel="Frequency", legend=true, label="configuration model")
 vline!([orig_cc], label = "network", linestyle = :solid, color = :green)
-savefig(current(), "cc-food.pdf")
+savefig(current(), "cc-bio.pdf")
 
 gr()
-histogram(config_model_mean, bins=30, title="Food Web vs Null - ⟨l⟩", xlabel="Mean path length ⟨l⟩", ylabel="Frequency", legend=true, label="configuration model")
+histogram(config_model_mean, bins=30, title="Connectome vs Null - ⟨l⟩", xlabel="Mean path length ⟨l⟩", ylabel="Frequency", legend=true, label="configuration model")
 vline!([orig_mean_path_len], label = "network", linestyle = :solid, color = :green)
-savefig(current(), "mp-food.pdf")
+savefig(current(), "mp-bio.pdf")
 
 ## https://icon.colorado.edu/networks 
-## https://www.nature.com/articles/srep21179#Sec9
+## https://pitgroup.org/connectome/#manual
 
-## nearshore 
+# just the above
 
 
 
