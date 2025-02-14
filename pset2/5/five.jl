@@ -129,7 +129,7 @@ for node in vertices
   hcs[node] = comp_one_harmoic_cent(adj_list, node)
 end
 
-using Plots
+using Plots, StatsPlots
 gr()
 
 plot(xlabel = "Family Index", ylabel = "Harmonic Centrality",
