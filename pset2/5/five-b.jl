@@ -258,21 +258,24 @@ end
 using Plots, StatsPlots, CategoricalArrays
 gr()
 # ordered_nodes = []
-ordered_null_hcs_minus :: Vector{Vector{Float64}} = []
 
 ordered_null :: Vector{Vector{Float64}} = []
-m_minus = -1
+
+dumb_to_real :: Dict{Int, Int} = Dict()
+
+m = -1 
 i = 1
-for (node, hc_minus) in null_hc_minus
-  global i 
-  global m_minus
-  if (node == 8)
-    m_minus = i
+for (node, hc_c) in null_hcs
+  global m
+  global i
+  if node == 8
+    m = i
   end
+  dumb_to_real[i] = node
   i += 1
   
   # push!(ordered_nodes, node + 1)
-  push!(ordered_null_hcs_minus, hc_minus)
+  push!(ordered_null, hc_c)
 end
 
 
@@ -288,15 +291,20 @@ println(ordered_nodes)
 # println(length(ordered_null_hcs_minus[2]))
 
 # # Create the box plot
-p = boxplot(ordered_nodes, ordered_null_hcs_minus, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Null Minus", legend = false)
+boxplot(ordered_nodes, ordered_null, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Null Minus", legend = false)
+
+for (dumb, real) in dumb_to_real
+  scatter!([dumb], [hcs[real]], markersize = 8)
+end
+
 # colors = repeat(["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2"], outer=length(ordered_nodes))
 
 
 # # Add a vertical line at a specific x value (e.g., at the x-position of "C")
-vline!(p, [m_minus], label="Medici", color=:green, linestyle=:dash)
+vline!([m], label="Medici", color=:green, linestyle=:dash)
 
 
-savefig(p, "hc-minus-null.pdf")
+savefig(current(), "hc-null.pdf")
 
 
 # Example data: 16 x values with corresponding y-values
