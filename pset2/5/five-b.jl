@@ -242,7 +242,7 @@ for node in vertices
   null_hcs[node] = []
 end
 
-for i in 1:10
+for i in 1:1000
   global edges
   global adj_list
   global count
@@ -255,30 +255,45 @@ for i in 1:10
 
 end
 
-using Plots, StatsPlots
+using Plots, StatsPlots, CategoricalArrays
 gr()
-# ordered_nodes :: Vector{Int} = []
+# ordered_nodes = []
 ordered_null_hcs_minus :: Vector{Vector{Float64}} = []
+
+ordered_null :: Vector{Vector{Float64}} = []
+m_minus = -1
+i = 1
 for (node, hc_minus) in null_hcs
+  global i 
+  global m_minus
+  if (node == 8)
+    m_minus = i
+  end
+  i += 1
   
-  # push!(ordered_nodes, node)
+  # push!(ordered_nodes, node + 1)
   push!(ordered_null_hcs_minus, hc_minus)
 end
 
+
 ordered_nodes = [1:16]
+# ordered_nodes = categorical(ordered_nodes)
+
 println(ordered_nodes)
 
-println(ordered_null_hcs_minus)
+# println( length(ordered_nodes) == length(order_null_hc_minus) )
+
+# println(ordered_null_hcs_minus)
 
 # println(length(ordered_null_hcs_minus[2]))
 
 # # Create the box plot
-p = boxplot(ordered_nodes, ordered_null_hcs_minus, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Minus Null", legend = false)
+p = boxplot(ordered_nodes, ordered_null_hcs_minus, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Null Minus", legend = false)
 # colors = repeat(["#FF6347", "#4682B4", "#32CD32", "#FFD700", "#8A2BE2"], outer=length(ordered_nodes))
 
 
 # # Add a vertical line at a specific x value (e.g., at the x-position of "C")
-# vline!(p, [3], label="Medici", color=:red, linestyle=:dash)
+vline!(p, [m_minus], label="Medici", color=:green, linestyle=:dash)
 
 
 savefig(p, "hc-minus-null.pdf")
