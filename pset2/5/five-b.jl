@@ -225,6 +225,8 @@ adj_list :: Dict{Int, Set{Int}} = get_adj_list(edges)
 adj_list[11] = Set()
 vertices :: Vector{Int} = get_vertices(adj_list)
 
+# println(id_to_name)
+
 
 hcs :: Dict{Int, Float64} = Dict()
 
@@ -263,6 +265,8 @@ ordered_null :: Vector{Vector{Float64}} = []
 
 dumb_to_real :: Dict{Int, Int} = Dict()
 
+dumb_to_names :: Dict{Int, String} = Dict()
+
 m = -1 
 i = 1
 for (node, hc_c) in null_hcs
@@ -272,11 +276,14 @@ for (node, hc_c) in null_hcs
     m = i
   end
   dumb_to_real[i] = node
+  dumb_to_names[i] = id_to_name[node]
   i += 1
   
   # push!(ordered_nodes, node + 1)
   push!(ordered_null, hc_c)
 end
+
+print(dumb_to_names)
 
 
 ordered_nodes = [1:16]
@@ -291,7 +298,7 @@ println(ordered_nodes)
 # println(length(ordered_null_hcs_minus[2]))
 
 # # Create the box plot
-boxplot(ordered_nodes, ordered_null, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Null Minus", legend = false)
+boxplot(ordered_nodes, ordered_null, xlabel="Family Index", ylabel="Null HC - Actual", title="Florentine Families HC Null With HC", legend = false)
 
 for (dumb, real) in dumb_to_real
   scatter!([dumb], [hcs[real]], markersize = 8)
