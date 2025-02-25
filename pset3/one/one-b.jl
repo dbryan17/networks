@@ -70,6 +70,108 @@ function get_vertices(adj_list :: Dict{Int, Set{Int}}) :: Vector{Int}
   return vertices
 end
 
+function double_edge_swap(edges :: Set{Tuple{Int, Int}}, adj_dict :: Dict{Int, Set{Int}}, desired :: Int) :: Tuple{Set{Tuple{Int, Int}}, Dict{Int, Set{Int}}}
+  # perform [desired] double edge swaps of the given simple graph with edge set and adj_list
+  
+  adj_dict = deepcopy(adj_dict)
+  edges = deepcopy(edges)
+
+
+  edge_list = collect(edges)
+  edges_len = length(edge_list)
+  successfull = 0
+
+
+
+
+  while successfull < desired
+
+    # println(length(edge_list))
+    
+    # get random edges
+    idx1, idx2 = rand(1:edges_len), rand(1:edges_len)
+    while idx1 == idx2
+      idx2 = rand(1:edges_len)
+    end
+
+    (u, v) = edge_list[idx1]
+    (x, y) = edge_list[idx2]
+
+    # coin flip for diangnol or vertical
+    vertSwap = rand(Bool)
+
+    # could make it so if vert swap fails, try diagnol, but I think that makes this not random
+
+    if vertSwap 
+      if (u != x && v != y) && !(u in adj_dict[x]) && !(v in adj_dict[y]) # prevent self loops and multigraph
+        successfull += 1
+
+        # delete old from edge_list
+        # println(length(edge_list))
+        # println("1")
+        filter!(edge -> edge != (u,v), edge_list)
+        filter!(edge -> edge != (x,y), edge_list)
+        # println(length(edge_list))
+        # println("2")
+
+
+        # delete old from dict
+        delete!(adj_dict[u], v)
+        delete!(adj_dict[v], u)
+        delete!(adj_dict[x], y)
+        delete!(adj_dict[y], x)
+
+        # add to edge list
+        push!(edge_list, (u,x))
+        push!(edge_list, (v,y))
+        # println(length(edge_list))
+        # println("3")
+
+
+        # add to dict 
+        push!(adj_dict[u], x)
+        push!(adj_dict[x], u)
+        push!(adj_dict[v], y)
+        push!(adj_dict[y], v)
+      end
+    else 
+
+      # check if diagnol works 
+      if (u != y && v != x) && !(u in adj_dict[y]) && !(v in adj_dict[x]) # check
+        successfull += 1
+
+        # delete old from edge_list
+        filter!(edge -> edge != (u,v), edge_list)
+        filter!(edge -> edge != (x,y), edge_list)
+
+        # delete old from dict
+        delete!(adj_dict[u], v)
+        delete!(adj_dict[v], u)
+        delete!(adj_dict[x], y)
+        delete!(adj_dict[y], x)
+
+        # add to edge list
+        push!(edge_list, (u,y))
+        push!(edge_list, (v,x))
+
+        # add to dict 
+        push!(adj_dict[u], y)
+        push!(adj_dict[y], u)
+        push!(adj_dict[v], x)
+        push!(adj_dict[x], v)
+
+      end
+    end
+  end
+
+
+  # remake edges set
+  edges = Set(edge_list)
+
+  return (edges, adj_dict)
+
+end
+
 
 function remove_some_metas(nodes_metas :: Dict{Int, Int}, fraction_obs :: Float64) :: Dict{Int, Int}
 
@@ -202,6 +304,8 @@ function smooth_all(nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int,
 end
 
 
+
+
 function compute_baseline_acc(nodes_metas_truth :: Dict{Int, Int}) :: Float64
 
   attrs_to_total :: Dict{Int, Int} = Dict()
@@ -223,6 +327,20 @@ function compute_baseline_acc(nodes_metas_truth :: Dict{Int, Int}) :: Float64
 
 
   return sum
+
+end
+
+
+
+function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int}})
+  # TODO increase randomness from 0 to 1
+
+  # TODO remove 20% of nodes 
+
+  # TODO run local smoothing huerstic on graph
+
+  # TODO use 20% that were removed as a test for ACC??? why???
+
 
 end
 
@@ -272,8 +390,11 @@ if length(nbd_nodes_metas) != length(nbd_vertices)
 end
 
 
-println(compute_baseline_acc(nbd_nodes_metas))
-println(compute_baseline_acc(m_nodes_metas))
+# println(compute_baseline_acc(nbd_nodes_metas))
+# println(compute_baseline_acc(m_nodes_metas))
+
+
+# β = r/2m   r is number of double swaps tha
 
 
 #### HERE have all the meta data and vertices
@@ -307,6 +428,6 @@ plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2,
 plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2)
 
 
-savefig(current(), "test.pdf")
+savefig(current(), "test-b.pdf")
 
 ####### 
