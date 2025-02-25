@@ -197,7 +197,6 @@ end
 function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas_obs :: Dict{Int, Int}, all_attrs :: Vector{Int}) :: Int 
 
 
-  return rand(all_attrs)
   edges = edge_dict[node]
 
   
@@ -331,8 +330,12 @@ function compute_baseline_acc(nodes_metas_truth :: Dict{Int, Int}) :: Float64
 end
 
 
+function calculate_b(r :: Int, m :: Int) :: Float64
+  return r / (2*m)
+end
 
-function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int}})
+
+function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}}) :: Dict{Float64, Float64}
   # TODO increase randomness from 0 to 1
 
   # TODO remove 20% of nodes 
@@ -340,6 +343,57 @@ function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int
   # TODO run local smoothing huerstic on graph
 
   # TODO use 20% that were removed as a test for ACC??? why???
+
+  num_swaps :: Int = 0  
+
+  edges_len = length(edges)
+
+  num_iters = 20
+
+  num_bs = 100
+
+  max_num_swaps = 2 * edges_len
+
+  # Generate 20 logarithmically spaced points from 1 to max_swaps
+  swap_intervals = round.(Int, range(10, max_num_swaps; length=num_bs))
+
+  b_to_acc :: Dict{Float64, Float64} = Dict()
+
+
+  total_acc = 0
+  for i in 1:num_iters
+    nodes_metas_obs = remove_some_metas(nodes_meta_truth, .8)
+    acc = local_smooth(nodes_metas_obs, nodes_meta_truth, edge_dict)
+    total_acc += acc
+  end
+  average_acc = total_acc / num_iters
+
+  # uncomment for non log 10
+  b_to_acc[calculate_b(0, edges_len)] = average_acc
+
+
+  for num_swaps in swap_intervals
+
+    total_acc = 0
+    for i in 1:num_iters
+      (rand_edges, rand_adj_list) = double_edge_swap(deepcopy(edges), deepcopy(edge_dict), num_swaps)
+      nodes_metas_obs = remove_some_metas(nodes_meta_truth, .8)
+      acc = local_smooth(nodes_metas_obs, nodes_meta_truth, rand_adj_list)
+      total_acc += acc
+    end
+
+    average_acc = total_acc / num_iters
+
+    b_to_acc[calculate_b(num_swaps, edges_len)] = average_acc
+
+    num_swaps += round(max_num_swaps / num_bs)
+
+
+
+  end
+
+  return b_to_acc
+
 
 
 end
@@ -398,10 +452,11 @@ end
 
 
 #### HERE have all the meta data and vertices
+nbd_b_to_acc = oneb(nbd_nodes_metas, nbd_adj_list, nbd_edges)
 
-m_a_to_acc :: Dict{Float64, Float64} = smooth_all(m_nodes_metas, m_adj_list)
-nbd_a_to_acc = smooth_all(nbd_nodes_metas, nbd_adj_list)
-
+m_b_to_acc :: Dict{Float64, Float64} = oneb(m_nodes_metas, m_adj_list, m_edges)
+# 0.36977580663985826 --- m 
+# 0.5386345661562933 --- nbd
 
 
 
@@ -411,21 +466,26 @@ nbd_a_to_acc = smooth_all(nbd_nodes_metas, nbd_adj_list)
 # but I'm going on the assumption that we wouldn't even know what the attrs are
 
 # create plots
-x1 = collect(keys(m_a_to_acc))
-y1 = collect(values(m_a_to_acc))
+x1 = collect(keys(m_b_to_acc))
+y1 = collect(values(m_b_to_acc))
 
-x2 = collect(keys(nbd_a_to_acc))
-y2 = collect(values(nbd_a_to_acc))
+x2 = collect(keys(nbd_b_to_acc))
+y2 = collect(values(nbd_b_to_acc))
 
-x1_sorted, y1_sorted = first.(sort(collect(m_a_to_acc), by=first)), last.(sort(collect(m_a_to_acc), by=first))
-x2_sorted, y2_sorted = first.(sort(collect(nbd_a_to_acc), by=first)), last.(sort(collect(nbd_a_to_acc), by=first))
+x1_sorted, y1_sorted = first.(sort(collect(m_b_to_acc), by=first)), last.(sort(collect(m_b_to_acc), by=first))
+x2_sorted, y2_sorted = first.(sort(collect(nbd_b_to_acc), by=first)), last.(sort(collect(nbd_b_to_acc), by=first))
 
-plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2, 
-    xlabel="α - fraction of observed node labels compared to total",
+plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2, color = :red,
+    xlabel="β - amount of randomness",
     ylabel="ACC - accurary of predictions (correct / total)",
-    title = "Effectiveness of local smoothing"
+    title = "Local smoothing accuracy as a function of randomness", 
     )
-plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2)
+plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2, color = :green)
+
+hline!([0.5386345661562933], label = "BD baseline ACC", linestyle = :dash, color = :green)
+hline!([0.36977580663985826], label = "M baseline ACC", linestyle = :dash, color = :red)
+
+
 
 
 savefig(current(), "test-b.pdf")
