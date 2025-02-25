@@ -1,4 +1,6 @@
 using Graphs
+using Random
+using Plots
 
 dir_path = "./data/"
 
@@ -69,6 +71,134 @@ function get_vertices(adj_list :: Dict{Int, Set{Int}}) :: Vector{Int}
 end
 
 
+function remove_some_metas(nodes_metas :: Dict{Int, Int}, fraction_obs :: Float64) :: Dict{Int, Int}
+
+  # fraction obs is the fraction we want to have observered
+
+  fraction_to_remove = 1 - fraction_obs
+  num_to_remove :: Int = round(fraction_to_remove * length(nodes_metas))
+
+  old_dict = deepcopy(nodes_metas)
+
+  rand_keys = shuffle(collect(keys(old_dict)))
+
+  keys_to_rm = rand_keys[1: num_to_remove]
+
+  for k in keys_to_rm
+    pop!(old_dict, k)
+  end
+
+  return old_dict
+end
+
+
+function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas_obs :: Dict{Int, Int}, all_attrs :: Vector{Int}) :: Int 
+  edges = edge_dict[node]
+
+  
+
+  counts :: Vector{Int} = []
+  for edge in edges
+    if haskey(nodes_metas_obs, edge)
+      val = nodes_metas_obs[edge]
+      push!(counts, val)
+    end
+  end
+
+  if length(counts) == 0
+    # pull from distrubtion of all_attrs... which is the same as a random draw from the array
+    return rand(all_attrs)
+  end
+
+  counts_dict = Dict()
+
+  for meta in counts
+    if haskey(counts_dict, meta)
+      counts_dict[meta] = counts_dict[meta] + 1
+    else 
+      counts_dict[meta] = 1
+    end
+  end
+
+  maxes :: Vector{Int} = []
+  max = -1
+  
+
+  for (meta_var, count) in counts_dict
+    if count > max
+      max = count
+    end
+  end
+
+  for (meta_var, count) in counts_dict
+    if max == count
+      push!(maxes, meta_var)
+    end
+  end
+
+  # now return a random meta variable from all the maxes
+  return rand(maxes)
+
+end
+
+
+function local_smooth(nodes_metas_obs :: Dict{Int, Int}, nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int, Set{Int}}) :: Float64
+  # get all the attrs for baseline
+  all_attrs :: Vector{Int} = []
+  for (_, val) in nodes_metas_obs
+    push!(all_attrs, val)
+  end
+
+  correct_pred = 0
+  number_pred = 0
+
+  for (node, _) in nodes_metas_truth
+
+    if !(haskey(nodes_metas_obs, node))
+      predicted_meta_var = predict_meta(node, edges_dict, nodes_metas_obs, all_attrs)
+      real_meta_var = nodes_metas_truth[node]
+      if predicted_meta_var == real_meta_var
+        correct_pred += 1
+      end
+      number_pred += 1
+    end
+  end
+  return correct_pred / number_pred
+end
+
+
+function smooth_all(nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int, Set{Int}}) :: Dict{Float64, Float64}
+
+
+  a_to_acc = Dict()
+
+  # if we observed none, we will assume 0 percent accuracy
+  # a_to_acc[0.0] = 0.0
+  # we will assume 100 perfent accurary if we observe all of them, even tho there is
+  # no inputs so this is really undef
+  # a_to_acc[1.0] = 1.0 
+
+  curr_a = .01
+
+  num_iters = 100
+
+  while curr_a < 1.0
+    total_avg = 0
+    for i in 1:num_iters
+      nodes_metas_obs = remove_some_metas(nodes_metas_truth, curr_a)
+      total_avg += local_smooth(nodes_metas_obs, nodes_metas_truth, edges_dict)
+    end
+    full_avg = total_avg / num_iters
+    a_to_acc[curr_a] = full_avg
+
+    curr_a += .01
+  end
+
+  return a_to_acc
+
+end
+
+
 ######## 
 # nbd is 0-indexed, m is 1-indexed
 nbd_edges_f = "nbd-edges.txt"
@@ -116,5 +246,36 @@ end
 
 
 #### HERE have all the meta data and vertices
+
+m_a_to_acc :: Dict{Float64, Float64} = smooth_all(m_nodes_metas, m_adj_list)
+nbd_a_to_acc = smooth_all(nbd_nodes_metas, nbd_adj_list)
+
+
+
+
+# TODO add to discussion
+# assuming if we did not observe any attrs, we make no predictions 
+# the baseline doesn't work, and we could just pick randomly one of the attrs
+# but I'm going on the assumption that we wouldn't even know what the attrs are
+
+# create plots
+x1 = collect(keys(m_a_to_acc))
+y1 = collect(values(m_a_to_acc))
+
+x2 = collect(keys(nbd_a_to_acc))
+y2 = collect(values(nbd_a_to_acc))
+
+x1_sorted, y1_sorted = first.(sort(collect(m_a_to_acc), by=first)), last.(sort(collect(m_a_to_acc), by=first))
+x2_sorted, y2_sorted = first.(sort(collect(nbd_a_to_acc), by=first)), last.(sort(collect(nbd_a_to_acc), by=first))
+
+plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2, 
+    xlabel="α - fraction of observed node labels compared to total",
+    ylabel="ACC - accurary of predictions (correct / total)",
+    title = "Effectiveness of local smoothing"
+    )
+plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2)
+
+
+savefig(current(), "test.pdf")
 
 ####### 
