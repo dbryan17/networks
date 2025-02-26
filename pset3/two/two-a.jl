@@ -148,7 +148,7 @@ function jc(n1_neigh :: Set{Int}, n2_neigh :: Set{Int}):: Float64
   inter = intersect(n1_neigh, n2_neigh)
   un = union(n1_neigh, n2_neigh)
 
-  if (un == 0)
+  if (length(un) == 0)
     return 0.0
   end
 
@@ -203,15 +203,19 @@ function sort_table(score_table, sort_by)
   # i j tk JC DP SP TPR FPR 
   sorted_table = []
   if (sort_by == "jc")
-    sorted_table = sort(score_table, by = x -> x[4], rev=true)
+    sorted_table = sort(score_table, by = x -> x[4], rev=false)
+
 
   elseif (sort_by == "dp")
-    sorted_table = sort(score_table, by = x -> x[5], rev=true)
+    sorted_table = sort(score_table, by = x -> x[5], rev=false)
+    # for line in sorted_table
+    #   println(line[4])
+    # end
 
   
   elseif (sort_by == "sp")
     # this one will be smallest shortest path is most likely to make edge, so not
-    sorted_table = sort(score_table, by = x -> x[6], rev=false)
+    sorted_table = sort(score_table, by = x -> x[6], rev=true)
 
   else
     print("ERRROR")
@@ -231,9 +235,9 @@ function calc_auc(score_table)
     fpr = line[8]
     auc_sum += tpr * (fpr - prev_fpr)
     if (prev_fpr > fpr) 
-      println("not increasing")
-      println(prev_fpr)
-      println(fpr)
+      # println("not increasing")
+      # println(prev_fpr)
+      # println(fpr)
     end
     prev_fpr = fpr
 
@@ -250,7 +254,6 @@ function calc_tpr_and_fpr(score_table, sort_by, num_true_pos)
   sorted_table = sort_table(score_table, sort_by)
 
   total_fp = length(score_table) - num_true_pos
-
   tp_seen_so_far = 0 
   fp_seen_so_far = 0
   for (i, line) in enumerate(sorted_table)
@@ -274,13 +277,28 @@ function calc_tpr_and_fpr(score_table, sort_by, num_true_pos)
 
   # now we have sorted table
 
+  # prev_tpr = 0
+  # prev_fpr = 0
+
+  # for line in sorted_table
+  #   if line[7] < prev_tpr
+  #     print("ERRRRR")
+  #   end
+  #   if line[8] < prev_fpr
+  #     print("3333")
+  #   end
+  #   prev_tpr = line[7]
+  #   prev_fpr = line[8]
+
+  # end
+
 
   return sorted_table
 
 
 end
 
-function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set{Tuple{Int, Int}}, edges_missing :: Set{Tuple{Int, Int}})
+function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set{Tuple{Int, Int}}, edges_missing :: Set{Tuple{Int, Int}}) :: Tuple{Vector{Vector{Float64}}, Vector{Vector{Float64}}, Vector{Vector{Float64}}}
   # we make a prediction for each possible missing edge
 
   # this will be for a partially observed graph
@@ -314,11 +332,11 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
   for (i, j) in edges_to_predict
 
     # do predictions
-    jc_score = jc(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.00000001)
-    dp_score = dp(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.00000001)
+    jc_score = jc(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
+    dp_score = dp(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
     # TODO if it is zero, need to add
     shortest_path = shortest_path_from[i][j]
-    sp_score = shortest_path_preder(shortest_path) + (rand() * 0.00000001)
+    sp_score = shortest_path_preder(shortest_path) + (rand() * 0.000000000001)
     
     tau = 0
     if (i,j) in edges_missing
@@ -327,10 +345,50 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     push!(score_table, [i, j, tau, jc_score, dp_score, sp_score, -1, -1])
   end
 
-  # TODO do real calculation of TPR and FPR
-  score_table_jc = calc_tpr_and_fpr(score_table, "jc", length(edges_missing))
-  score_table_dp = calc_tpr_and_fpr(score_table, "dp", length(edges_missing))
-  score_table_sp = calc_tpr_and_fpr(score_table, "sp", length(edges_missing))
+  score_table_jc = deepcopy(calc_tpr_and_fpr(score_table, "jc", length(edges_missing)))
+  prev_tpr = 0
+  prev_fpr = 0
+
+  for line in score_table_jc
+    if line[7] < prev_tpr
+      println("24343")
+    end
+    if line[8] < prev_fpr
+      println("56566")
+    end
+    prev_tpr = line[7]
+    prev_fpr = line[8]
+
+  end
+  score_table_dp = deepcopy(calc_tpr_and_fpr(score_table, "dp", length(edges_missing)))
+  prev_tpr = 0
+  prev_fpr = 0
+
+  for line in score_table_dp
+    if line[7] < prev_tpr
+      println("ERRRRR")
+    end
+    if line[8] < prev_fpr
+      println("3333")
+    end
+    prev_tpr = line[7]
+    prev_fpr = line[8]
+
+  end
+  score_table_sp = deepcopy(calc_tpr_and_fpr(score_table, "sp", length(edges_missing)))
+  prev_tpr = 0
+  prev_fpr = 0
+  for line in score_table_sp
+    if line[7] < prev_tpr
+      println("111111")
+    end
+    if line[8] < prev_fpr
+      println("222222")
+    end
+    prev_tpr = line[7]
+    prev_fpr = line[8]
+
+  end
 
   return (score_table_jc, score_table_dp, score_table_sp)
 
@@ -369,6 +427,52 @@ function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
       # to get average AUC
       for i in 1:iters_for_each_g
         (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs, edges_obs, rmed_edges)
+
+        prev_tpr = 0
+        prev_fpr = 0
+        for line in jp_st
+          if line[7] < prev_tpr
+            println("000000")
+          end
+          if line[8] < prev_fpr
+            println("111111")
+          end
+          prev_tpr = line[7]
+          prev_fpr = line[8]
+      
+        end
+
+        prev_tpr = 0
+        prev_fpr = 0
+        for line in dp_st
+          if line[7] < prev_tpr
+            println("888888")
+          end
+          if line[8] < prev_fpr
+            println("99999999")
+          end
+          prev_tpr = line[7]
+          prev_fpr = line[8]
+      
+        end
+
+        prev_tpr = 0
+        prev_fpr = 0
+        for line in sp_st
+          if line[7] < prev_tpr
+            println("7777777")
+          end
+          if line[8] < prev_fpr
+            println("6666666")
+          end
+          prev_tpr = line[7]
+          prev_fpr = line[8]
+      
+        end
+
+      
+
+
         jp_auc = calc_auc(jp_st)
         sum_jp_auc += jp_auc
         dp_auc = calc_auc(dp_st)
