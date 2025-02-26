@@ -394,6 +394,69 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
 
 end
 
+function make_avgs(totals_arr :: Vector{Float64}, sum :: Int) :: Vector{Float64} 
+  totals_arr = deepcopy(totals_arr)
+  for (i, total) in enumerate(totals_arr)
+    totals_arr[i] = total / sum
+  end
+  return totals_arr
+end
+
+
+
+# this is the one to make the graph for the f = 8 for one of the networks
+function two_b(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
+  frac_to_obs = 0.8
+  num_rand_graphs = 4
+  iters_for_each_g = 4
+
+  (edge_dict_obs__, edges_obs__, rmed_edges__) = remove_some_edges(edge_dict, edges, frac_to_obs)
+  (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs__, edges_obs__, rmed_edges__)
+  lenn = length(jp_st)
+
+  tpr_totals_jp :: Vector{Float64} = zeros(lenn)
+  fpr_totals_jp :: Vector{Float64} = zeros(lenn)
+  tpr_totals_dp :: Vector{Float64} = zeros(lenn)
+  fpr_totals_dp :: Vector{Float64} = zeros(lenn)
+  tpr_totals_sp :: Vector{Float64} = zeros(lenn)
+  fpr_totals_sp :: Vector{Float64} = zeros(lenn)
+
+
+  for i in 1:num_rand_graphs
+    println(i)
+    (edge_dict_obs, edges_obs, rmed_edges) = remove_some_edges(edge_dict, edges, frac_to_obs)
+    # to get average AUC
+    for i in 1:iters_for_each_g
+      (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs, edges_obs, rmed_edges)
+      # tpr is 7 
+      # fpr is 8
+      for (i, line) in enumerate(jp_st)
+        tpr_totals_jp[i] = tpr_totals_jp[i] + line[7]
+        fpr_totals_jp[i] = fpr_totals_jp[i] + line[8]
+      end
+      for (i, line) in enumerate(dp_st)
+        tpr_totals_dp[i] = tpr_totals_dp[i] + line[7]
+        fpr_totals_dp[i] = fpr_totals_dp[i] + line[8]
+      end
+      for (i, line) in enumerate(sp_st)
+        tpr_totals_sp[i] = tpr_totals_sp[i] + line[7]
+        fpr_totals_sp[i] = fpr_totals_sp[i] + line[8]
+      end
+    end
+  end
+
+  sum = num_rand_graphs * iters_for_each_g
+
+  return (
+    (make_avgs(tpr_totals_jp, sum), make_avgs(fpr_totals_jp, sum)), 
+    (make_avgs(tpr_totals_dp, sum), make_avgs(fpr_totals_dp, sum)), 
+    (make_avgs(tpr_totals_sp, sum), make_avgs(fpr_totals_sp, sum))
+  )
+
+
+
+end
+
 
 
 function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
@@ -559,6 +622,19 @@ plot!(fs, m_dps, label = "DP", lw=2, color = :green)
 plot!(fs, m_sps, label = "SP", lw =2, color = :blue)
 hline!([.5], label = "AUC = .5", linestyle = :dash, color = :orange)
 savefig(current(), "two-m.pdf")
+
+
+((tr_jp, fr_jp), (tr_dp, fr_dp), (tr_sp, fr_sp)) = two_b(nbd_adj_list, nbd_edges)
+
+plot(fr_jp, tr_jp, label="JP", lw=2, color = :red,
+     xlabel="average false positive rate (FPR)",
+     ylabel="average true positive rate (TPR)", 
+     title="NBD - ROC curves for predictors at f = .8"
+)
+plot!(fr_dp, tr_dp, label="DP", lw=2, color = :green)
+plot!(fr_sp, tr_sp, label="SP", lw=2, color = :blue)
+plot!([0, 1], [0, 1], linestyle=:dash, label="acc = .5")
+savefig(current(), "two-b.pdf")
 
 
 # plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2, color = :red,
