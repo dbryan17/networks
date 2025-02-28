@@ -216,6 +216,11 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
 
   counts_dict = Dict()
 
+
+  # TODO add to write up just chooses mode of distrubtion... so the random cnverange is just the ratio of the biggest
+  # so the binary one is the same as the baseline becuase it is binary, but the other is not 
+
+  # the way to get here, is to think about the what happens to the neighbors, it just turns into the graph, so the proablity turns into that of graph, so we ususally pick the highest mode
   for meta in counts
     if haskey(counts_dict, meta)
       counts_dict[meta] = counts_dict[meta] + 1

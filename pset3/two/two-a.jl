@@ -177,6 +177,9 @@ function create_graph(edgeSet, length)
 end 
 
 function shortest_path_preder(length) 
+
+  ###   4 ... turns into 1/4 
+  ###
   if length == Inf
     return 0.0
   else
@@ -208,21 +211,20 @@ function sort_table(score_table, sort_by)
   # i j tk JC DP SP TPR FPR 
   sorted_table = []
   if (sort_by == "jc")
-    sorted_table = deepcopy(sort(score_table, by = x -> x[4], rev=true))
-
-  
-  # TODO deep copy bug
+    sorted_table = sort(score_table, by = x -> x[4], rev=true)
 
   elseif (sort_by == "dp")
-    sorted_table = deepcopy(sort(score_table, by = x -> x[5], rev=true))
+    sorted_table = sort(score_table, by = x -> x[5], rev=true)
     # for line in sorted_table
     #   println(line[4])
     # end
 
   
   elseif (sort_by == "sp")
-    # this one will be smallest shortest path is most likely to make edge, so not
-    sorted_table = deepcopy(sort(score_table, by = x -> x[6], rev=false))
+    # recall, the shortest path score nromailzed with 1/length, so we should still sort highest to largest
+    # which is rev=true
+
+    sorted_table = sort(score_table, by = x -> x[6], rev=true)
 
   else
     print("ERRROR")
@@ -350,10 +352,7 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     end
     push!(score_table, [i, j, tau, jc_score, dp_score, sp_score, -1, -1])
   end
-  score_table_1 = deepcopy(score_table)
-  score_table_2 = deepcopy(score_table)
-  score_table_3 = deepcopy(score_table)
-  score_table_jc = deepcopy(calc_tpr_and_fpr(score_table_1, "jc", length(edges_missing)))
+  score_table_jc = calc_tpr_and_fpr(score_table, "jc", length(edges_missing))
   prev_tpr = 0
   prev_fpr = 0
 
@@ -368,7 +367,7 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     prev_fpr = line[8]
 
   end
-  score_table_dp = deepcopy(calc_tpr_and_fpr(score_table_2, "dp", length(edges_missing)))
+  score_table_dp = calc_tpr_and_fpr(score_table, "dp", length(edges_missing))
   prev_tpr = 0
   prev_fpr = 0
 
@@ -383,7 +382,7 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     prev_fpr = line[8]
 
   end
-  score_table_sp = deepcopy(calc_tpr_and_fpr(score_table_3, "sp", length(edges_missing)))
+  score_table_sp = calc_tpr_and_fpr(score_table, "sp", length(edges_missing))
   prev_tpr = 0
   prev_fpr = 0
   for line in score_table_sp
