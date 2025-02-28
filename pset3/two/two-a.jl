@@ -147,19 +147,23 @@ end
 function jc(n1_neigh :: Set{Int}, n2_neigh :: Set{Int}):: Float64
   inter = intersect(n1_neigh, n2_neigh)
   un = union(n1_neigh, n2_neigh)
+  len1 = length(inter)
+  len2 = length(un)
 
-  if (length(un) == 0)
+  if (len2 == 0)
     return 0.0
   end
 
 
 
-  return length(inter) / length(un)
+  return len1 / len2
 
 end 
 
 function dp(n1_neigh :: Set{Int}, n2_neigh :: Set{Int})
-  return length(n1_neigh) * length(n2_neigh)
+  len1 = length(n1_neigh)
+  len2 = length(n2_neigh)
+  return len1 * len2
 end
 
 function create_graph(edgeSet, length)
@@ -197,17 +201,20 @@ function get_edges_to_pred(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Se
   return to_predict
 end 
 
+# spring embbedder algorithm
 
 
 function sort_table(score_table, sort_by) 
   # i j tk JC DP SP TPR FPR 
   sorted_table = []
   if (sort_by == "jc")
-    sorted_table = sort(score_table, by = x -> x[4], rev=false)
+    sorted_table = deepcopy(sort(score_table, by = x -> x[4], rev=true))
 
+  
+  # TODO deep copy bug
 
   elseif (sort_by == "dp")
-    sorted_table = sort(score_table, by = x -> x[5], rev=false)
+    sorted_table = deepcopy(sort(score_table, by = x -> x[5], rev=true))
     # for line in sorted_table
     #   println(line[4])
     # end
@@ -215,7 +222,7 @@ function sort_table(score_table, sort_by)
   
   elseif (sort_by == "sp")
     # this one will be smallest shortest path is most likely to make edge, so not
-    sorted_table = sort(score_table, by = x -> x[6], rev=true)
+    sorted_table = deepcopy(sort(score_table, by = x -> x[6], rev=false))
 
   else
     print("ERRROR")
@@ -251,7 +258,7 @@ end
 function calc_tpr_and_fpr(score_table, sort_by, num_true_pos)
   # first need to sort based on the thing we want 
   # i j tk JC DP SP TPR FPR 
-  sorted_table = sort_table(score_table, sort_by)
+  sorted_table = deepcopy(sort_table(score_table, sort_by))
 
   total_fp = length(score_table) - num_true_pos
   tp_seen_so_far = 0 
@@ -334,7 +341,6 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     # do predictions
     jc_score = jc(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
     dp_score = dp(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
-    # TODO if it is zero, need to add
     shortest_path = shortest_path_from[i][j]
     sp_score = shortest_path_preder(shortest_path) + (rand() * 0.000000000001)
     
@@ -344,8 +350,10 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     end
     push!(score_table, [i, j, tau, jc_score, dp_score, sp_score, -1, -1])
   end
-
-  score_table_jc = deepcopy(calc_tpr_and_fpr(score_table, "jc", length(edges_missing)))
+  score_table_1 = deepcopy(score_table)
+  score_table_2 = deepcopy(score_table)
+  score_table_3 = deepcopy(score_table)
+  score_table_jc = deepcopy(calc_tpr_and_fpr(score_table_1, "jc", length(edges_missing)))
   prev_tpr = 0
   prev_fpr = 0
 
@@ -360,7 +368,7 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     prev_fpr = line[8]
 
   end
-  score_table_dp = deepcopy(calc_tpr_and_fpr(score_table, "dp", length(edges_missing)))
+  score_table_dp = deepcopy(calc_tpr_and_fpr(score_table_2, "dp", length(edges_missing)))
   prev_tpr = 0
   prev_fpr = 0
 
@@ -375,7 +383,7 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     prev_fpr = line[8]
 
   end
-  score_table_sp = deepcopy(calc_tpr_and_fpr(score_table, "sp", length(edges_missing)))
+  score_table_sp = deepcopy(calc_tpr_and_fpr(score_table_3, "sp", length(edges_missing)))
   prev_tpr = 0
   prev_fpr = 0
   for line in score_table_sp
@@ -394,8 +402,8 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
 
 end
 
-function make_avgs(totals_arr :: Vector{Float64}, sum :: Int) :: Vector{Float64} 
-  totals_arr = deepcopy(totals_arr)
+function make_avgs(totals_arr_in :: Vector{Float64}, sum :: Int) :: Vector{Float64} 
+  totals_arr = deepcopy(totals_arr_in)
   for (i, total) in enumerate(totals_arr)
     totals_arr[i] = total / sum
   end
@@ -407,8 +415,8 @@ end
 # this is the one to make the graph for the f = 8 for one of the networks
 function two_b(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
   frac_to_obs = 0.8
-  num_rand_graphs = 4
-  iters_for_each_g = 4
+  num_rand_graphs = 2
+  iters_for_each_g = 2
 
   (edge_dict_obs__, edges_obs__, rmed_edges__) = remove_some_edges(edge_dict, edges, frac_to_obs)
   (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs__, edges_obs__, rmed_edges__)
@@ -626,7 +634,7 @@ savefig(current(), "two-m.pdf")
 
 ((tr_jp, fr_jp), (tr_dp, fr_dp), (tr_sp, fr_sp)) = two_b(nbd_adj_list, nbd_edges)
 
-plot(fr_jp, tr_jp, label="JP", lw=2, color = :red,
+plot(fr_jp, tr_jp, label="JC", lw=2, color = :red,
      xlabel="average false positive rate (FPR)",
      ylabel="average true positive rate (TPR)", 
      title="NBD - ROC curves for predictors at f = .8"
