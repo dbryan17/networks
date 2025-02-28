@@ -430,6 +430,7 @@ function two_b(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
 
 
   for i in 1:num_rand_graphs
+    println("number of rand graph")
     println(i)
     (edge_dict_obs, edges_obs, rmed_edges) = remove_some_edges(edge_dict, edges, frac_to_obs)
     # to get average AUC
@@ -486,6 +487,7 @@ function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
   f_to_sp_auc = []
 
   while frac_to_obs < 1
+    println("frac to observe...")
     println(frac_to_obs)
     # get get more options of removed edges
 
@@ -642,21 +644,3 @@ plot!(fr_dp, tr_dp, label="DP", lw=2, color = :green)
 plot!(fr_sp, tr_sp, label="SP", lw=2, color = :blue)
 plot!([0, 1], [0, 1], linestyle=:dash, label="acc = .5")
 savefig(current(), "two-b.pdf")
-
-
-# plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2, color = :red,
-#     xlabel="β - amount of randomness",
-#     ylabel="ACC - accurary of predictions (correct / total)",
-#     title = "Local smoothing accuracy as a function of randomness", 
-#     )
-# plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2, color = :green)
-
-# hline!([0.5386345661562933], label = "BD baseline ACC", linestyle = :dash, color = :green)
-# hline!([0.36977580663985826], label = "M baseline ACC", linestyle = :dash, color = :red)
-
-
-
-
-# savefig(current(), "test-b.pdf")
-
-####### 

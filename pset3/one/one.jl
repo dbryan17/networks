@@ -95,7 +95,7 @@ end
 function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas_obs :: Dict{Int, Int}, all_attrs :: Vector{Int}) :: Int 
 
 
-  return rand(all_attrs)
+  # return rand(all_attrs)
   edges = edge_dict[node]
 
   
@@ -183,10 +183,12 @@ function smooth_all(nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int,
 
   curr_a = .01
 
-  num_iters = 100
+  num_iters = 1000
 
   while curr_a < 1.0
     total_avg = 0
+    println("curr a ")
+    println(curr_a)
     for i in 1:num_iters
       nodes_metas_obs = remove_some_metas(nodes_metas_truth, curr_a)
       total_avg += local_smooth(nodes_metas_obs, nodes_metas_truth, edges_dict)
@@ -307,6 +309,6 @@ plot(x1_sorted, y1_sorted, label="Malaria var DBLa Cys-PoLV groups", lw=2,
 plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2)
 
 
-savefig(current(), "test.pdf")
+savefig(current(), "one-a.pdf")
 
 ####### 

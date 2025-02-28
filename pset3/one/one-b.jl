@@ -353,13 +353,13 @@ function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int
 
   edges_len = length(edges)
 
-  num_iters = 20
+  num_iters = 100
 
   num_bs = 100
 
   max_num_swaps = 2 * edges_len
 
-  # Generate 20 logarithmically spaced points from 1 to max_swaps
+  # just evenly spaced
   swap_intervals = round.(Int, range(10, max_num_swaps; length=num_bs))
 
   b_to_acc :: Dict{Float64, Float64} = Dict()
@@ -378,6 +378,10 @@ function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int
 
 
   for num_swaps in swap_intervals
+
+    println("curr num swaps out of 7710 if diff is 78")
+    println("out of 5368 if diff is 54")
+    println(num_swaps)
 
     total_acc = 0
     for i in 1:num_iters
@@ -493,6 +497,6 @@ hline!([0.36977580663985826], label = "M baseline ACC", linestyle = :dash, color
 
 
 
-savefig(current(), "test-b.pdf")
+savefig(current(), "one-b.pdf")
 
 ####### 
