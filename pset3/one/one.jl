@@ -94,11 +94,7 @@ end
 
 function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas_obs :: Dict{Int, Int}, all_attrs :: Vector{Int}) :: Int 
 
-
-  # return rand(all_attrs)
-  edges = edge_dict[node]
-
-  
+  edges :: Set{Int} = edge_dict[node]
 
   counts :: Vector{Int} = []
   for edge in edges
@@ -110,6 +106,7 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
 
   if length(counts) == 0
     # pull from distrubtion of all_attrs... which is the same as a random draw from the array
+    # this is defaulting to baseline, becuase we have no adjancecy infomation to go off of
     return rand(all_attrs)
   end
 
@@ -140,12 +137,14 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
   end
 
   # now return a random meta variable from all the maxes
+  # this is "breaking ties"
   return rand(maxes)
 
 end
 
 
 function local_smooth(nodes_metas_obs :: Dict{Int, Int}, nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int, Set{Int}}) :: Float64
+
   # get all the attrs for baseline
   all_attrs :: Vector{Int} = []
   for (_, val) in nodes_metas_obs
@@ -174,19 +173,12 @@ function smooth_all(nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int,
 
 
   a_to_acc = Dict()
-
-  # if we observed none, we will assume 0 percent accuracy
-  # a_to_acc[0.0] = 0.0
-  # we will assume 100 perfent accurary if we observe all of them, even tho there is
-  # no inputs so this is really undef
-  # a_to_acc[1.0] = 1.0 
-
   curr_a = .01
-
   num_iters = 1000
 
   while curr_a < 1.0
     total_avg = 0
+    # progress infomation
     println("curr a ")
     println(curr_a)
     for i in 1:num_iters
@@ -261,7 +253,7 @@ for (node, meta) in m_nodes_metas
 end
 
 
-
+# sanity checks
 if length(m_nodes_metas) != length(m_vertices)
   println(length(m_vertices))
   println(length(m_nodes_metas))
@@ -273,23 +265,14 @@ if length(nbd_nodes_metas) != length(nbd_vertices)
   println("EEEE")
 end
 
-
+# get the baseline expected AUC
 println(compute_baseline_acc(nbd_nodes_metas))
 println(compute_baseline_acc(m_nodes_metas))
 
 
-#### HERE have all the meta data and vertices
-
 m_a_to_acc :: Dict{Float64, Float64} = smooth_all(m_nodes_metas, m_adj_list)
 nbd_a_to_acc = smooth_all(nbd_nodes_metas, nbd_adj_list)
 
-
-
-
-# TODO add to discussion
-# assuming if we did not observe any attrs, we make no predictions 
-# the baseline doesn't work, and we could just pick randomly one of the attrs
-# but I'm going on the assumption that we wouldn't even know what the attrs are
 
 # create plots
 x1 = collect(keys(m_a_to_acc))
@@ -311,4 +294,3 @@ plot!(x2_sorted, y2_sorted, label="Board of Directors Gender", lw=2)
 
 savefig(current(), "one-a.pdf")
 
-####### 

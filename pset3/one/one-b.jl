@@ -1,3 +1,5 @@
+# Lots of copying from one-b.jl
+
 using Graphs
 using Random
 using Plots
@@ -16,7 +18,6 @@ function get_edges(filename) :: Set{Tuple{Int, Int}}
   end
   return edge_set
 end
-
 
 function add_meta_data_nbd(filename) :: Dict{Int, Int}
   # returns a dict which is vertex -> metavar (1 or 2)
@@ -85,8 +86,6 @@ function double_edge_swap(edges :: Set{Tuple{Int, Int}}, adj_dict :: Dict{Int, S
 
 
   while successfull < desired
-
-    # println(length(edge_list))
     
     # get random edges
     idx1, idx2 = rand(1:edges_len), rand(1:edges_len)
@@ -107,13 +106,8 @@ function double_edge_swap(edges :: Set{Tuple{Int, Int}}, adj_dict :: Dict{Int, S
         successfull += 1
 
         # delete old from edge_list
-        # println(length(edge_list))
-        # println("1")
         filter!(edge -> edge != (u,v), edge_list)
         filter!(edge -> edge != (x,y), edge_list)
-        # println(length(edge_list))
-        # println("2")
-
 
         # delete old from dict
         delete!(adj_dict[u], v)
@@ -124,9 +118,6 @@ function double_edge_swap(edges :: Set{Tuple{Int, Int}}, adj_dict :: Dict{Int, S
         # add to edge list
         push!(edge_list, (u,x))
         push!(edge_list, (v,y))
-        # println(length(edge_list))
-        # println("3")
-
 
         # add to dict 
         push!(adj_dict[u], x)
@@ -176,7 +167,6 @@ end
 function remove_some_metas(nodes_metas :: Dict{Int, Int}, fraction_obs :: Float64) :: Dict{Int, Int}
 
   # fraction obs is the fraction we want to have observered
-
   fraction_to_remove = 1 - fraction_obs
   num_to_remove :: Int = round(fraction_to_remove * length(nodes_metas))
 
@@ -199,8 +189,6 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
 
   edges = edge_dict[node]
 
-  
-
   counts :: Vector{Int} = []
   for edge in edges
     if haskey(nodes_metas_obs, edge)
@@ -216,11 +204,6 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
 
   counts_dict = Dict()
 
-
-  # TODO add to write up just chooses mode of distrubtion... so the random cnverange is just the ratio of the biggest
-  # so the binary one is the same as the baseline becuase it is binary, but the other is not 
-
-  # the way to get here, is to think about the what happens to the neighbors, it just turns into the graph, so the proablity turns into that of graph, so we ususally pick the highest mode
   for meta in counts
     if haskey(counts_dict, meta)
       counts_dict[meta] = counts_dict[meta] + 1
@@ -231,7 +214,6 @@ function predict_meta(node :: Int, edge_dict :: Dict{Int, Set{Int}}, nodes_metas
 
   maxes :: Vector{Int} = []
   max = -1
-  
 
   for (meta_var, count) in counts_dict
     if count > max
@@ -280,12 +262,6 @@ function smooth_all(nodes_metas_truth :: Dict{Int, Int}, edges_dict :: Dict{Int,
 
 
   a_to_acc = Dict()
-
-  # if we observed none, we will assume 0 percent accuracy
-  # a_to_acc[0.0] = 0.0
-  # we will assume 100 perfent accurary if we observe all of them, even tho there is
-  # no inputs so this is really undef
-  # a_to_acc[1.0] = 1.0 
 
   curr_a = .01
 
@@ -341,13 +317,6 @@ end
 
 
 function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}}) :: Dict{Float64, Float64}
-  # TODO increase randomness from 0 to 1
-
-  # TODO remove 20% of nodes 
-
-  # TODO run local smoothing huerstic on graph
-
-  # TODO use 20% that were removed as a test for ACC??? why???
 
   num_swaps :: Int = 0  
 
@@ -397,13 +366,9 @@ function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int
 
     num_swaps += round(max_num_swaps / num_bs)
 
-
-
   end
 
   return b_to_acc
-
-
 
 end
 
@@ -453,26 +418,15 @@ if length(nbd_nodes_metas) != length(nbd_vertices)
 end
 
 
-# println(compute_baseline_acc(nbd_nodes_metas))
-# println(compute_baseline_acc(m_nodes_metas))
-
-
 # β = r/2m   r is number of double swaps tha
 
 
-#### HERE have all the meta data and vertices
 nbd_b_to_acc = oneb(nbd_nodes_metas, nbd_adj_list, nbd_edges)
 
 m_b_to_acc :: Dict{Float64, Float64} = oneb(m_nodes_metas, m_adj_list, m_edges)
 # 0.36977580663985826 --- m 
 # 0.5386345661562933 --- nbd
 
-
-
-# TODO add to discussion
-# assuming if we did not observe any attrs, we make no predictions 
-# the baseline doesn't work, and we could just pick randomly one of the attrs
-# but I'm going on the assumption that we wouldn't even know what the attrs are
 
 # create plots
 x1 = collect(keys(m_b_to_acc))

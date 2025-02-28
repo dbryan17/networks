@@ -10,6 +10,8 @@ function get_edges(filename) :: Set{Tuple{Int, Int}}
     for line in eachline(f)
       nodes = split(line)
       node1, node2 = parse(Int, nodes[1]), parse(Int, nodes[2])
+
+      # make them not zero-indexed to fix julia issues
       if node1 == 0 
         node1 = 1421
       end 
@@ -98,7 +100,7 @@ function add_meta_data_m(filename) :: Dict{Int, Int}
 end
 
 ######## 
-# nbd is 0-indexed, m is 1-indexed
+# nbd is 0-indexed, m is 1-indexed... we fix that
 nbd_edges_f = "nbd-edges.txt"
 nbd_meta_f = "nbd-nodes.txt"
 
@@ -111,8 +113,6 @@ nbd_adj_list :: Dict{Int, Set{Int}} = get_adj_list(nbd_edges)
 nbd_vertices :: Vector{Int} = get_vertices(nbd_adj_list)
 
 nbd_nodes_metas :: Dict{Int, Int} = add_meta_data_nbd(nbd_meta_f)
-
-
 
 m_edges :: Set{Tuple{Int, Int}} = get_edges(m_edges_f)
 m_adj_list :: Dict{Int, Set{Int}} = get_adj_list(m_edges)
@@ -128,10 +128,7 @@ for (node, meta) in m_nodes_metas
   end
 end
 
-# keep meta data just to add nodes with no edges
-
-
-
+# sanity check
 if length(m_nodes_metas) != length(m_vertices)
   println(length(m_vertices))
   println(length(m_nodes_metas))
@@ -139,11 +136,10 @@ if length(m_nodes_metas) != length(m_vertices)
   
 end
 if length(nbd_nodes_metas) != length(nbd_vertices) 
-
   println("bad")
 end
 
-
+# jaccard coefficent calculation
 function jc(n1_neigh :: Set{Int}, n2_neigh :: Set{Int}):: Float64
   inter = intersect(n1_neigh, n2_neigh)
   un = union(n1_neigh, n2_neigh)
@@ -153,13 +149,11 @@ function jc(n1_neigh :: Set{Int}, n2_neigh :: Set{Int}):: Float64
   if (len2 == 0)
     return 0.0
   end
-
-
-
   return len1 / len2
 
 end 
 
+# degree product calculation
 function dp(n1_neigh :: Set{Int}, n2_neigh :: Set{Int})
   len1 = length(n1_neigh)
   len2 = length(n2_neigh)
@@ -176,10 +170,9 @@ function create_graph(edgeSet, length)
   return g
 end 
 
+# normalizes shortest path so we can still sort in desencding order
 function shortest_path_preder(length) 
 
-  ###   4 ... turns into 1/4 
-  ###
   if length == Inf
     return 0.0
   else
@@ -204,32 +197,27 @@ function get_edges_to_pred(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Se
   return to_predict
 end 
 
-# spring embbedder algorithm
-
 
 function sort_table(score_table, sort_by) 
   # i j tk JC DP SP TPR FPR 
+
+  # sorts the table based on what we care about for the given predicotr... all rev=true becuase desecending
   sorted_table = []
   if (sort_by == "jc")
     sorted_table = sort(score_table, by = x -> x[4], rev=true)
 
   elseif (sort_by == "dp")
     sorted_table = sort(score_table, by = x -> x[5], rev=true)
-    # for line in sorted_table
-    #   println(line[4])
-    # end
 
-  
   elseif (sort_by == "sp")
     # recall, the shortest path score nromailzed with 1/length, so we should still sort highest to largest
     # which is rev=true
-
     sorted_table = sort(score_table, by = x -> x[6], rev=true)
 
+  # sanity check
   else
     print("ERRROR")
   end
-
   return sorted_table
 end
 
@@ -244,9 +232,7 @@ function calc_auc(score_table)
     fpr = line[8]
     auc_sum += tpr * (fpr - prev_fpr)
     if (prev_fpr > fpr) 
-      # println("not increasing")
-      # println(prev_fpr)
-      # println(fpr)
+      println("not increasing")
     end
     prev_fpr = fpr
 
@@ -262,6 +248,7 @@ function calc_tpr_and_fpr(score_table, sort_by, num_true_pos)
   # i j tk JC DP SP TPR FPR 
   sorted_table = deepcopy(sort_table(score_table, sort_by))
 
+  # calc AUC
   total_fp = length(score_table) - num_true_pos
   tp_seen_so_far = 0 
   fp_seen_so_far = 0
@@ -284,24 +271,6 @@ function calc_tpr_and_fpr(score_table, sort_by, num_true_pos)
     print("RRRR")
   end
 
-  # now we have sorted table
-
-  # prev_tpr = 0
-  # prev_fpr = 0
-
-  # for line in sorted_table
-  #   if line[7] < prev_tpr
-  #     print("ERRRRR")
-  #   end
-  #   if line[8] < prev_fpr
-  #     print("3333")
-  #   end
-  #   prev_tpr = line[7]
-  #   prev_fpr = line[8]
-
-  # end
-
-
   return sorted_table
 
 
@@ -319,13 +288,10 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
   
   g = create_graph(edges_obs, length(edge_dict_obs))
 
-  # keys are nodes, vertices are the weird thing that is returned form the built in shortest path alg
-
+  # keys are nodes, values are a list of shortest path from key node to all other nodes
   shortest_path_from = Dict()
   for (i, j) in edges_to_predict
     if !(i in keys(shortest_path_from))
-      # print(i)
-      # println(dijkstra_shortest_paths(g, epi, [i]).dists)
       shortest_path_from[i] = dijkstra_shortest_paths(g, i).dists
     end
     if !(j in keys(shortest_path_from))
@@ -335,12 +301,12 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
 
 
   # i j tk JC DP SP TPR FPR 
-
   score_table :: Vector{Vector{Float64}}  = []
  
   for (i, j) in edges_to_predict
 
     # do predictions
+    # tie breaker is addding + (rand() * 0.000000000001)
     jc_score = jc(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
     dp_score = dp(edge_dict_obs[i], edge_dict_obs[j]) + (rand() * 0.000000000001)
     shortest_path = shortest_path_from[i][j]
@@ -352,50 +318,10 @@ function make_predictions(edge_dict_obs :: Dict{Int, Set{Int}}, edges_obs :: Set
     end
     push!(score_table, [i, j, tau, jc_score, dp_score, sp_score, -1, -1])
   end
+
   score_table_jc = calc_tpr_and_fpr(score_table, "jc", length(edges_missing))
-  prev_tpr = 0
-  prev_fpr = 0
-
-  for line in score_table_jc
-    if line[7] < prev_tpr
-      println("24343")
-    end
-    if line[8] < prev_fpr
-      println("56566")
-    end
-    prev_tpr = line[7]
-    prev_fpr = line[8]
-
-  end
   score_table_dp = calc_tpr_and_fpr(score_table, "dp", length(edges_missing))
-  prev_tpr = 0
-  prev_fpr = 0
-
-  for line in score_table_dp
-    if line[7] < prev_tpr
-      println("ERRRRR")
-    end
-    if line[8] < prev_fpr
-      println("3333")
-    end
-    prev_tpr = line[7]
-    prev_fpr = line[8]
-
-  end
   score_table_sp = calc_tpr_and_fpr(score_table, "sp", length(edges_missing))
-  prev_tpr = 0
-  prev_fpr = 0
-  for line in score_table_sp
-    if line[7] < prev_tpr
-      println("111111")
-    end
-    if line[8] < prev_fpr
-      println("222222")
-    end
-    prev_tpr = line[7]
-    prev_fpr = line[8]
-
-  end
 
   return (score_table_jc, score_table_dp, score_table_sp)
 
@@ -461,20 +387,11 @@ function two_b(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
     (make_avgs(tpr_totals_sp, sum), make_avgs(fpr_totals_sp, sum))
   )
 
-
-
 end
 
 
 
 function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
-
-  # function remove_some_edges(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}}, frac_to_observe :: Float64) :: Tuple{Dict{Int, Set{Int}}, Set{Tuple{Int, Int}}}
-
-  # need full ROC curve for the three predictors for one of the 
-  
-  # TODO question for OH... do we need the do the thing where we break ties randomly and compute average? 
-  # OR can we just use epsilon and call it good
 
   frac_to_obs = 0.05
 
@@ -499,52 +416,6 @@ function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
       # to get average AUC
       for i in 1:iters_for_each_g
         (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs, edges_obs, rmed_edges)
-
-        prev_tpr = 0
-        prev_fpr = 0
-        for line in jp_st
-          if line[7] < prev_tpr
-            println("000000")
-          end
-          if line[8] < prev_fpr
-            println("111111")
-          end
-          prev_tpr = line[7]
-          prev_fpr = line[8]
-      
-        end
-
-        prev_tpr = 0
-        prev_fpr = 0
-        for line in dp_st
-          if line[7] < prev_tpr
-            println("888888")
-          end
-          if line[8] < prev_fpr
-            println("99999999")
-          end
-          prev_tpr = line[7]
-          prev_fpr = line[8]
-      
-        end
-
-        prev_tpr = 0
-        prev_fpr = 0
-        for line in sp_st
-          if line[7] < prev_tpr
-            println("7777777")
-          end
-          if line[8] < prev_fpr
-            println("6666666")
-          end
-          prev_tpr = line[7]
-          prev_fpr = line[8]
-      
-        end
-
-      
-
-
         jp_auc = calc_auc(jp_st)
         sum_jp_auc += jp_auc
         dp_auc = calc_auc(dp_st)
@@ -572,11 +443,9 @@ function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
   return (f_to_jp_auc, f_to_dp_auc, f_to_sp_auc)
 end
 
-####### here start problem #########
 
 (nbd_f_to_jc, nbd_f_to_dp, nbd_f_to_sp) = two_a(nbd_adj_list, nbd_edges)
 (m_f_to_jc, m_f_to_dp, m_f_to_sp) = two_a(m_adj_list, m_edges)
-####################################
 
 if (length(nbd_f_to_dp) != length(m_f_to_jc))
   print("********")
