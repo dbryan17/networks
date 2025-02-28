@@ -353,7 +353,7 @@ function oneb(nodes_meta_truth :: Dict{Int, Int}, edge_dict :: Dict{Int, Set{Int
 
   edges_len = length(edges)
 
-  num_iters = 100
+  num_iters = 1000
 
   num_bs = 100
 

@@ -414,8 +414,8 @@ end
 # this is the one to make the graph for the f = 8 for one of the networks
 function two_b(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
   frac_to_obs = 0.8
-  num_rand_graphs = 2
-  iters_for_each_g = 2
+  num_rand_graphs = 20
+  iters_for_each_g = 40
 
   (edge_dict_obs__, edges_obs__, rmed_edges__) = remove_some_edges(edge_dict, edges, frac_to_obs)
   (jp_st, dp_st, sp_st) = make_predictions(edge_dict_obs__, edges_obs__, rmed_edges__)
@@ -478,9 +478,9 @@ function two_a(edge_dict :: Dict{Int, Set{Int}}, edges :: Set{Tuple{Int, Int}})
 
   frac_to_obs = 0.05
 
-  num_rand_graphs = 1
+  num_rand_graphs = 10
 
-  iters_for_each_g = 1
+  iters_for_each_g = 20
 
   f_to_jp_auc = []
   f_to_dp_auc = []
